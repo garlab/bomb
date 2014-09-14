@@ -104,6 +104,7 @@ Bomb.prototype = {
 
     bombs[ this.id ] = null;
     $( "#" + this.id ).html( "" );
+    this.clean();
 
     $.each( area, function( i, bombId ) {
       var bomb = bombs[ bombId ];
@@ -119,6 +120,10 @@ Bomb.prototype = {
   }, grow: function() {
     this.size++;
     // TODO: update DOM
+  }, clean: function() {
+    $.each( this.area(), function( i, bombId ) {
+      $( "#" + bombId ).css({background: "#ccc"});
+    });
   },
 };
 
@@ -142,9 +147,7 @@ $(function() {
 
           var bomb = bombs[ id ];
           if ( bomb ) {
-            $.each( bomb.area(), function( i, bombId ) {
-              $( "#" + bombId ).css({background: "#ccc"});
-            });
+            bomb.clean();
           }
         }).click(function() {
           var id = $( this ).attr( "id" );
