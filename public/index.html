@@ -26,6 +26,8 @@
     }
 
     .bomb {
+      text-align: center;
+      line-height: 28px;
       margin: auto;
       height: 28px;
       width: 28px;
@@ -41,65 +43,100 @@
     <p>Bomb!</p>
     <div id="grid"></div>
     <script>
+var GRID_SIZE = 12;
+var NB_BOMBS = 3;
+
+var bombs = {};
+
+function addBombs() {
+  for ( var i = 0; i < NB_BOMBS; ++i ) {
+    var bomb = new Bomb();
+
+    if ( bombs[ bomb.id ] ) {
+      bombs[ bomb.id ].size++;
+    } else {
+      bombs[ bomb.id ] = bomb;
+      $( "<div>", { class: "bomb " + bomb.style } )
+        .html( bomb.size )
+        .appendTo( $( "#" + bomb.id ) );
+    } 
+  }
+}
+
+function rand( max ) {
+  return Math.floor( Math.random() * max );
+}
+
+function id( x, y ) {
+  return x + "-" + y;
+}
+
+function color() {
+  var colors = [ "red", "green", "blue" ];
+  return colors[ rand(colors.length) ];
+}
+
+function Bomb() {
+  this.x = rand( GRID_SIZE );
+  this.y = rand( GRID_SIZE );
+  this.color = color();
+  this.size = 1;
+
+  this.id = id( this.x, this.y);
+  this.style = "bomb-" + this.color;
+}
+
+Bomb.prototype = {
+  area:  function() {
+    var area = [];
+    for ( var i = 0; i <= this.size; ++i ) {
+      area.push(
+        id( this.x, this.y - 1),
+        id( this.x + 1, this.y),
+        id( this.x, this.y + 1),
+        id( this.x - 1, this.y)
+      );
+    }
+    return area;
+  },
+};
+
 $(function() {
-  var GRID_SIZE = 12;
-  var NB_BOMBS = 3;
-
-  var bombs = {};
-
   var $grid = $( "#grid" );
 
   for ( var i = 0; i < GRID_SIZE; ++i ) {
     for ( var j = 0; j < GRID_SIZE; ++j ) {
-      $( "<div>", { id: i + "-" + j, class: "cell" } )
-        .click(function() {
+      $( "<div>", { id: id( i, j), class: "cell" } )
+        .mouseover(function() {
+          var id = $( this ).attr( "id" );
+
+          var bomb = bombs[ id ];
+          if ( bomb ) {
+            $.each( bomb.area(), function( i, bombId ) {
+              $( "#" + bombId ).css({background: bomb.color});
+            });
+          }
+        }).mouseout(function () {
+          var id = $( this ).attr( "id" );
+
+          var bomb = bombs[ id ];
+          if ( bomb ) {
+            $.each( bomb.area(), function( i, bombId ) {
+              $( "#" + bombId ).css({background: "#ccc"});
+            });
+          }
+        }).click(function() {
           var id = $( this ).attr( "id" );
 
           var bomb = bombs[ id ];
           if ( bomb ) {
             console.log("bomb here");
-          } else {
-            console.log("no bomb");
           }
         }).appendTo( $grid );
     }
   }
 
   addBombs();
-
-  function addBombs() {
-    for ( var i = 0; i < NB_BOMBS; ++i ) {
-      var bomb = new Bomb();
-
-      if ( bombs[ bomb.id ] ) {
-        bombs[ bomb.id ].size++;
-      } else {
-        bombs[ bomb.id ] = bomb;
-        $( "<div>", { class: "bomb " + bomb.style } ).appendTo( $( "#" + bomb.id ) );
-      } 
-    }
-  }
-
-  function rand( max ) {
-    return Math.floor( Math.random() * max );
-  }
-
-  function color() {
-    var colors = [ "red", "green", "blue" ];
-    return colors[ rand(colors.length) ];
-  }
-
-  function Bomb() {
-    this.x = rand( GRID_SIZE );
-    this.y = rand( GRID_SIZE );
-    this.color = color();
-    this.size = 1;
-
-    this.id = this.x + "-" + this.y;
-    this.style = "bomb-" + this.color;
-  }
-
-  Bomb.prototype.explode
 });
     </script>
   </body>
