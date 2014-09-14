@@ -90,12 +90,12 @@ Bomb.prototype = {
   area:  function() {
     var area = [];
     
-    for ( var i = 0; i <= this.size; ++i ) {
+    for ( var i = 1; i <= this.size; ++i ) {
       area.push(
-        id( this.x, this.y - 1 ),
-        id( this.x + 1, this.y ),
-        id( this.x, this.y + 1 ),
-        id( this.x - 1, this.y )
+        id( this.x, this.y - i ),
+        id( this.x + i, this.y ),
+        id( this.x, this.y + i ),
+        id( this.x - i, this.y )
       );
     }
     return area;
@@ -106,7 +106,8 @@ Bomb.prototype = {
     $( "#" + this.id ).html( "" );
     this.clean();
 
-    $.each( area, function( i, bombId ) {
+    for ( var i = 0; i < area.length; ++i ) {
+      var bombId = area[ i ];
       var bomb = bombs[ bombId ];
 
       if ( bomb ) {
@@ -116,10 +117,10 @@ Bomb.prototype = {
           bomb.grow();
         }
       }
-    });
+    }
   }, grow: function() {
     this.size++;
-    // TODO: update DOM
+    $( "#" + this.id + " .bomb").html( this.size );
   }, clean: function() {
     $.each( this.area(), function( i, bombId ) {
       $( "#" + bombId ).css({background: "#ccc"});
