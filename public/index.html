@@ -42,7 +42,7 @@ $(function() {
   var GRID_SIZE = 12;
   var NB_BOMBS = 3;
 
-  var grid = {};
+  var bombs = {};
 
   var $grid = $( "#grid" );
 
@@ -50,7 +50,14 @@ $(function() {
     for ( var j = 0; j < GRID_SIZE; ++j ) {
       $( "<div>", { id: i + "-" + j, class: "cell" } )
         .click(function() {
-          console.log( $(this).attr( "id" ) );
+          var id = $( this ).attr( "id" );
+
+          var bomb = bombs[ id ];
+          if ( bomb ) {
+            console.log("bomb here");
+          } else {
+            console.log("no bomb");
+          }
         }).appendTo( $grid );
     }
   }
@@ -63,18 +70,21 @@ $(function() {
 
   function addBombs() {
     for ( var i = 0; i < NB_BOMBS; ++i ) {
-      var cell = new Cell();
+      var bomb = new Bomb();
 
-      grid[cell.id] = cell;
-
-      $( "<div>", { class: "bomb" } ).appendTo( $( cell.id ) ); 
+      if ( bombs[ bomb.id ] ) {
+        bombs[ bomb.id ].size++;
+      } else {
+        bombs[ bomb.id ] = bomb;
+        $( "<div>", { class: "bomb" } ).appendTo( $( "#" + bomb.id ) );
+      } 
     }
   }
 
-  function Cell() {
+  function Bomb() {
     this.x = getRandomPosition();
     this.y = getRandomPosition();
-    this.id = "#" + this.x + "-" + this.y;
+    this.id = this.x + "-" + this.y;
   }
 });
     </script>
