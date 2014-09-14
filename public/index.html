@@ -53,7 +53,7 @@ function addBombs() {
     var bomb = new Bomb();
 
     if ( bombs[ bomb.id ] ) {
-      bombs[ bomb.id ].size++;
+      bombs[ bomb.id ].grow();
     } else {
       bombs[ bomb.id ] = bomb;
       $( "<div>", { class: "bomb " + bomb.style } )
@@ -89,15 +89,36 @@ function Bomb() {
 Bomb.prototype = {
   area:  function() {
     var area = [];
+    
     for ( var i = 0; i <= this.size; ++i ) {
       area.push(
-        id( this.x, this.y - 1),
-        id( this.x + 1, this.y),
-        id( this.x, this.y + 1),
-        id( this.x - 1, this.y)
+        id( this.x, this.y - 1 ),
+        id( this.x + 1, this.y ),
+        id( this.x, this.y + 1 ),
+        id( this.x - 1, this.y )
       );
     }
     return area;
+  }, explode: function() {
+    var area = this.area();
+
+    bombs[ this.id ] = null;
+    $( "#" + this.id ).html( "" );
+
+    $.each( area, function( i, bombId ) {
+      var bomb = bombs[ bombId ];
+
+      if ( bomb ) {
+        if ( bomb.color == this.color) {
+          bomb.explode();
+        } else {
+          bomb.grow();
+        }
+      }
+    });
+  }, grow: function() {
+    this.size++;
+    // TODO: update DOM
   },
 };
 
@@ -130,7 +151,8 @@ $(function() {
 
           var bomb = bombs[ id ];
           if ( bomb ) {
-            console.log("bomb here");
+            bomb.explode();
+            addBombs();
           }
         }).appendTo( $grid );
     }
