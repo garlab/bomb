@@ -30,8 +30,11 @@
       height: 28px;
       width: 28px;
       border-radius: 14px;
-      background: green;
     }
+
+    .bomb-red { background: red; }
+    .bomb-green { background: green; }
+    .bomb-blue { background: blue; }
     </style>
   </head>
   <body>
@@ -64,10 +67,6 @@ $(function() {
 
   addBombs();
 
-  function getRandomPosition() {
-    return Math.floor( Math.random() * GRID_SIZE );
-  }
-
   function addBombs() {
     for ( var i = 0; i < NB_BOMBS; ++i ) {
       var bomb = new Bomb();
@@ -76,16 +75,31 @@ $(function() {
         bombs[ bomb.id ].size++;
       } else {
         bombs[ bomb.id ] = bomb;
-        $( "<div>", { class: "bomb" } ).appendTo( $( "#" + bomb.id ) );
+        $( "<div>", { class: "bomb " + bomb.style } ).appendTo( $( "#" + bomb.id ) );
       } 
     }
   }
 
-  function Bomb() {
-    this.x = getRandomPosition();
-    this.y = getRandomPosition();
-    this.id = this.x + "-" + this.y;
+  function rand( max ) {
+    return Math.floor( Math.random() * max );
   }
+
+  function color() {
+    var colors = [ "red", "green", "blue" ];
+    return colors[ rand(colors.length) ];
+  }
+
+  function Bomb() {
+    this.x = rand( GRID_SIZE );
+    this.y = rand( GRID_SIZE );
+    this.color = color();
+    this.size = 1;
+
+    this.id = this.x + "-" + this.y;
+    this.style = "bomb-" + this.color;
+  }
+
+  Bomb.prototype.explode
 });
     </script>
   </body>
